@@ -170,4 +170,5 @@ for index, sound in transcript_d.items():
 # print(transcript_d)
 
 # Print my finished baby
+
 print("|" + "".join(transcript_d.values()) + "|")
