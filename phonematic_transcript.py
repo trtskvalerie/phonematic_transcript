@@ -4,101 +4,134 @@ print("Програма фонематичної транскрипції слі
 uni_vowels = ['а', 'о', 'у', 'е', 'і', 'и', 'я', 'ю', 'є', 'ї']
 vowels = ['а', 'о', 'у', 'е', 'і', 'и']
 double_vowels = ['я', 'ю', 'є', 'ї']
-consonants = ['б', 'в', 'г', 'ґ', 'д', 'ж', 'з', 'й', 'к', 'л', 'м', 'н', 'п', 'р', 'с', 'т', 'ф', 'х', 'ц', 'ч', 'ш', 'ь']
+consonants = ['б', 'в', 'г', 'ґ', 'д', 'ж', 'з', 'й', 'к', 'л', 'м', 'н', 'п', 'р', 'с', 'т', 'ф', 'х', 'ц', 'ч', 'ш',
+              'ь', 'z', 'j']
 
 # Lists of sounds according to their characteristics
-consonant_sounds = ['б', 'в', 'г', 'ґ', 'д', "д'", 'дж', "дз'", 'дз', 'ж', 'з', "з'", 'й', 'к', 'л', "л'", 'м',
+consonant_sounds = ['б', 'в', 'г', 'ґ', 'д', "д'", 'j', "z'", 'z', 'ж', 'з', "з'", 'й', 'к', 'л', "л'", 'м',
                     'н', "н'", 'п', 'р', "р'", 'с', "с'", 'т', "т'", 'ф', 'х', 'ц', "ц'", 'ч', 'ш']
-soft_cons = ["д'", "дз'", "з'", "л'", "н'", "р'", "с'", "т'", "ц'"]
-hard_only = ['б', 'в', 'г', 'ґ', 'дж', 'ж', 'к', 'м', 'п', 'ф', 'х', 'ч', 'ш']
-hard_soft_l = ["д", "дз", "з", "л", "н", "р", "с", "т", "ц"]
-whistle_cons = ['з', "з'", 'с', "с'", 'дз', "дз'", 'ц', "ц'"]
+soft_cons = ["д'", "z'", "з'", "л'", "н'", "р'", "с'", "т'", "ц'"]
+whistle_cons = ['з', "з'", 'с', "с'", 'z', "z'", 'ц', "ц'"]
 
 # Replace tools
-hard_soft_replace = {"д" : "д'", "дз" : "дз'", "з" : "з'", "л" : "л'",
+hard_soft_replace = {"д" : "д'", "z" : "z'", "з" : "з'", "л" : "л'",
                      "н" : "н'", "р" : "р'", "с" : "с'", "т" : "т'", "ц" : "ц'"}
+hard_softened = {"б!" : "б", "в!" : "в", "ф!" : "ф", "м!" : "м", "п!" : "п", "г!" : "г", "ґ!" : "ґ", "j!" : "j",
+                 "ж!" : "ж", "к!" : "к", "ч!" : "ч", "х!" : "х", "ш!" : "ш"}
 dv_replace_1 = {"я" : "йа", "ю" : "йу", "є" : "йе", "ї" : "йі"}
 dv_replace_2 = {"я" : "а", "ю" : "у", "є" : "е", "ї" : "і"}
-asml_voice = {"п" : "б", "к" : "ґ", "т" : "д", "т'" : "д'", "ч" : "дж", "ц" : "дз", "ц'" : "дз'", "ш" : "ж", "с" : "з",
+asml_voice = {"п" : "б", "к" : "ґ", "т" : "д", "т'" : "д'", "ч" : "j", "ц" : "z", "ц'" : "z'", "ш" : "ж", "с" : "з",
               "с'" : "з'", "" : "г"}
-asml_unvoice = {"б" : "п", "ґ" : "к", "д" : "т", "д'" : "т'", "дж" : "ч", "дз" : "ц", "дз'" : "ц'", "ж" : "ш", "з" : "с",
+asml_unvoice = {"б" : "п", "ґ" : "к", "д" : "т", "д'" : "т'", "j" : "ч", "z" : "ц", "z'" : "ц'", "ж" : "ш", "з" : "с",
                 "з'" : "с'"}
 asml_soft_obl = {"д" : "д'", "т" : "т'", "н" : "н'"}
-asml_manner = {"д" : "дз", "д'" : "дз'", "т" : "ц", "т'" : "ц'"}
-asml_manner_place_1 = {"д" : "дж", "д'" : "дж", "т" : "ч", "т'" : "ч", "з" : "ж", "з'" : "ж",
-                     "с" : "ш", "с'" : "ш", "дз" : "дж", "дз'" : "дж", "ц" : "ч", "ц'" : "ч"}
-asml_manner_place_2 = {"ж" : "з", "ш" : "с", "дж" : "дз", "ч" : "ц"}
+asml_manner = {"д" : "z", "д'" : "z'", "т" : "ц", "т'" : "ц'"}
+asml_manner_place_1 = {"д" : "j", "д'" : "j", "т" : "ч", "т'" : "ч", "з" : "ж", "з'" : "ж",
+                     "с" : "ш", "с'" : "ш", "z" : "j", "z'" : "j", "ц" : "ч", "ц'" : "ч"}
+asml_manner_place_2 = {"ж" : "з", "ш" : "с", "j" : "z", "ч" : "ц"}
+# voc_semivowels = {"в" : "ў", "й" : "ĭ"}
+preffs = ['від', 'під', 'над', 'перед', 'серед']
 
 # Variables/dicts the code needs
 transcript_d = dict()
 ind = 1
+stress = int()
 sound = str()
 
 
-
-word = input("Введіть слово: ")
+word = input('Введіть слово: ')
 word = word.lower()
-word = word.replace(" ", "")
-# stress = int(input("На який за рахунком символ падає наголос у вашому слові?: "))
-# stress -= 1
-#
-# if word[stress] not in uni_vowels:
-#     stress = int(input("Ви поставили наголос на приголосний; будь ласка, поставте його на голосний: "))
-#     stress -= 1
+word = word.replace(' ', '')
+
+
+def z_j_replace(word):
+    for n, symb in enumerate(word):
+        if symb == 'д' and word[n + 1] == 'з':
+            if (word[n - 2] + word[n - 1] + symb) in preffs: pass
+            elif (word[n - 4] + word[n - 3] + word[n - 2] + word[n - 1] + symb) in preffs: pass
+            else:
+                word = word[:n] + 'zz' + word[n + 2:]
+        if symb == 'д' and word[n + 1] == 'ж':
+            if (word[n - 2] + word[n - 1] + symb) in preffs: pass
+            elif (word[n - 4] + word[n - 3] + word[n - 2] + word[n - 1] + symb) in preffs: pass
+            else:
+                word = word[:n] + 'jj' + word[n + 2:]
+    else:
+        word = word.replace('zz', 'z')
+        word = word.replace('jj', 'j')
+        return word
 
 
 # Transcribing the entire word (not including assimilation) - done
-transcript = ""
-for letter in word:
+word = z_j_replace(word)
+transcript = ''
+for n, letter in enumerate(word):
     if letter in uni_vowels:
         if letter in double_vowels:
-            if transcript == "" or transcript[-1] in vowels:
+            if transcript == '' or transcript[-1] in vowels or word[n - 1] == '-':
                 transcript += dv_replace_1[letter]
             elif transcript[-1] == "'":
                 transcript = transcript[:-1]
                 transcript += dv_replace_1[letter]
-            elif transcript[-1] in hard_soft_l:
+            elif transcript[-1] in hard_soft_replace.keys():
                 transcript += "'"
                 transcript += dv_replace_2[letter]
-            elif transcript[-1] in hard_only:
-                transcript += dv_replace_2[letter]
-            elif transcript[-1] == "ь":
-                transcript = transcript.replace(transcript[-1], "'")
+            elif transcript[-1] in hard_softened.values():
+                transcript += '!' + dv_replace_2[letter]
+            elif transcript[-1] == 'ь':
+                if transcript[-2] in hard_soft_replace.keys():
+                    transcript = transcript[:-1] + "'"
+                elif transcript[-2] in hard_softened.values():
+                    transcript = transcript[:-1] + '!'
                 transcript += dv_replace_1[letter]
-            elif transcript[-1] == "й":
+            elif transcript[-1] == 'й':
                 transcript += dv_replace_1[letter]
         else:
-            if letter == "і" and transcript:
-                if transcript[-1] in hard_soft_l:
-                    transcript += "'" + letter
+            if transcript:
+                if letter == 'і':
+                    if transcript[-1] in hard_soft_replace.keys():
+                        transcript += "'" + letter
+                    elif transcript[-1] in hard_softened.values():
+                        transcript += '!' + letter
+                    else: transcript += letter
+                elif letter == 'о':
+                    if transcript[-1] == 'ь':
+                        transcript = transcript[:-1] + "'" + letter
+                    else: transcript += letter
                 else: transcript += letter
             else: transcript += letter
     else:
-        if letter == "-": pass
+        if letter == '-': pass
+        elif letter == '+':
+            stress = len(transcript)
         elif letter == "'":
             transcript += letter
         elif letter in consonants and transcript:
-            if transcript[-1] == "ь":
-                transcript = transcript.replace(transcript[-1], "'")
+            if transcript[-1] == 'ь':
+                transcript = transcript[:-1] + "'"
                 transcript += letter
             else:
                 transcript += letter
-        elif letter == "щ":
-            transcript += "шч"
+        elif letter == 'щ':
+            transcript += 'шч'
         elif letter in consonants:
             transcript += letter
 else:
-    if transcript[-1] == "ь":
-        if transcript[-2] in hard_soft_l:
-            transcript = transcript.replace(transcript[-1], "'")
+    if transcript[-1] == 'ь':
+        if transcript[-2] in hard_soft_replace.keys():
+            transcript = transcript[:-1] + "'"
         else:
-            transcript = transcript.replace(transcript[-1], "")
-# print("|" + transcript + "|")
+            transcript = transcript[:-1]
+if stress:
+    transcript = transcript[:stress] + '+' + transcript[stress:]
+# print('|' + transcript + '|')
 
 
 # Creating a dictionary for each sound with own index - done
 for token in transcript:
-    if token != "'":
+    if token == '+':
+        stress = ind
+    elif token != "'" and token != '!':
         if sound:
             transcript_d[ind] = sound
             ind += 1
@@ -110,6 +143,14 @@ else:
         transcript_d[ind] = sound
 # print(transcript_d)
 
+
+# Assimilation hard to soft before half_soft labial sounds
+for index, sound in transcript_d.items():
+    if sound in hard_softened.keys():
+        if index != 1:
+            if transcript_d[index - 1] in hard_soft_replace.keys():
+                transcript_d[index - 1] = hard_soft_replace[transcript_d[index - 1]]
+        transcript_d[index] = hard_softened[sound]
 
 # Assimilation (voiced/unvoiced) - done
 for index, sound in transcript_d.items():
@@ -154,7 +195,7 @@ for index, sound in transcript_d.items():
 for index, sound in transcript_d.items():
     if index != len(transcript_d):
         if transcript_d[index + 1] in soft_cons:
-            if sound in asml_soft_obl.keys() and transcript_d[index + 1] in asml_soft_obl.values():
+            if sound in asml_soft_obl.keys():
                 transcript_d[index] = asml_soft_obl[sound]
             elif sound in whistle_cons and "'" not in sound:
                 transcript_d[index] = hard_soft_replace[sound]
@@ -168,5 +209,9 @@ for index, sound in transcript_d.items():
                 transcript_d[index + 1] = "ц'"
 # print(transcript_d)
 
+# Capitalize stressed vowel
+if stress:
+    transcript_d[stress] = transcript_d[stress].upper()
+
 # Print my finished baby
-print("|" + "".join(transcript_d.values()) + "|")
+print('|' + ' '.join(transcript_d.values()) + '|')
