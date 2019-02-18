@@ -6,6 +6,7 @@ vowels = ['а', 'о', 'у', 'е', 'і', 'и']
 double_vowels = ['я', 'ю', 'є', 'ї']
 consonants = ['б', 'в', 'г', 'ґ', 'д', 'ж', 'з', 'й', 'к', 'л', 'м', 'н', 'п', 'р', 'с', 'т', 'ф', 'х', 'ц', 'ч', 'ш',
               'ь', 'z', 'j']
+asml_voice_unvoice = ["легк", "вогк", "кігт", "нігт", "дьогт", "дігт"]
 
 # Lists of sounds according to their characteristics
 consonant_sounds = ['б', 'в', 'г', 'ґ', 'д', "д'", 'j', "z'", 'z', 'ж', 'з', "з'", 'й', 'к', 'л', "л'", 'м',
@@ -66,6 +67,10 @@ def z_j_replace(word):
 # Transcribing the entire word (not including assimilation) - done
 word = z_j_replace(word)
 if 'яєчн' in word: word = word.replace('яєчн', 'яєшн')
+for el in asml_voice_unvoice:
+    if el in word:
+        new_el = el.replace("г", "х")
+        word = word.replace(el, new_el)
 transcript = ''
 for n, letter in enumerate(word):
     if letter in uni_vowels:
