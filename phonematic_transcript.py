@@ -16,7 +16,7 @@ whistle_cons = ['з', "з'", 'с', "с'", 'z', "z'", 'ц', "ц'"]
 # Replace tools
 hard_soft_replace = {'д' : "д'", 'z' : "z'", 'з' : "з'", 'л' : "л'",
                      'н' : "н'", 'р' : "р'", 'с' : "с'", 'т' : "т'", 'ц' : "ц'"}
-hard_softened = {'б!' : 'б', 'в!' : 'в', 'ф!' : 'ф', 'м!' : 'м', 'п!' : 'п', 'г!' : 'г', 'ґ!' : 'ґ', 'j!' : 'j',
+hard_softened = {'б!' : 'б', 'в!' : 'в', 'ф!' : 'ф', 'м!': 'м', 'п!' : 'п', 'г!' : 'г', 'ґ!' : 'ґ', 'j!' : 'j',
                  'ж!' : 'ж', 'к!' : 'к', 'ч!' : 'ч', 'х!' : 'х', 'ш!' : 'ш'}
 dv_replace_1 = {'я' : 'йа', 'ю' : 'йу', 'є' : 'йе', 'ї' : 'йі'}
 dv_replace_2 = {'я' : 'а', 'ю' : 'у', 'є' : 'е', 'ї' : 'і'}
@@ -64,7 +64,7 @@ def z_j_replace(word):
         return word
 
 
-# Transcribing the entire word (not including assimilation) - done
+# Transcribing the entire word (not including assimilation)
 word = z_j_replace(word)
 if 'яєчн' in word: word = word.replace('яєчн', 'яєшн')
 for el in asml_voice_unvoice:
@@ -129,10 +129,9 @@ else:
             transcript = transcript[:-1]
 if stress:
     transcript = transcript[:stress] + '+' + transcript[stress:]
-# print('|' + transcript + '|')
 
 
-# Creating a dictionary for each sound with own index - done
+# Creating a dictionary for each sound with own index
 for token in transcript:
     if token == '+':
         stress = ind
@@ -146,7 +145,6 @@ for token in transcript:
 else:
     if sound:
         transcript_d[ind] = sound
-# print(transcript_d)
 
 
 # Assimilation hard to soft before half_soft labial sounds
@@ -157,7 +155,7 @@ for index, sound in transcript_d.items():
                 transcript_d[index - 1] = hard_soft_replace[transcript_d[index - 1]]
         transcript_d[index] = hard_softened[sound]
 
-# Assimilation (voiced/unvoiced) - done
+# Assimilation (voiced/unvoiced)
 for index, sound in transcript_d.items():
     if index != len(transcript_d):
         if sound in asml_unvoice.keys() and transcript_d[index + 1] in asml_unvoice.values():
@@ -165,9 +163,8 @@ for index, sound in transcript_d.items():
                 transcript_d[index] = asml_unvoice[sound]
         elif sound in asml_voice.keys() and transcript_d[index + 1] in asml_voice.values():
             transcript_d[index] = asml_voice[sound]
-# print(transcript_d)
 
-# Vocalization (semivowels) - done
+# Vocalization (semivowels)
 # for index, sound in transcript_d.items():
 #     if sound in voc_semivowels.keys():
 #         if index == len(transcript_d):
@@ -176,16 +173,14 @@ for index, sound in transcript_d.items():
 #             pass
 #         elif transcript_d[index + 1] in consonant_sounds:
 #             transcript_d[index] = voc_semivowels[sound]
-# print(transcript_d)
 
-# Assimilation of manner - done
+# Assimilation of manner
 for index, sound in transcript_d.items():
     if index != len(transcript_d):
         if sound in asml_manner.keys() and transcript_d[index + 1] in whistle_cons:
             transcript_d[index] = asml_manner[sound]
-# print(transcript_d)
 
-# Assimilation of manner and place - done
+# Assimilation of manner and place
 for index, sound in transcript_d.items():
     if index != len(transcript_d):
         if transcript_d[index + 1] in asml_manner_place_1.values():
@@ -194,9 +189,8 @@ for index, sound in transcript_d.items():
         elif transcript_d[index + 1] in whistle_cons:
             if sound in asml_manner_place_2.keys():
                 transcript_d[index] = asml_manner_place_2[sound]
-# print(transcript_d)
 
-# Assimilation hard to soft - done
+# Assimilation hard to soft
 for index, sound in transcript_d.items():
     if index != len(transcript_d):
         if transcript_d[index + 1] in soft_cons:
@@ -204,7 +198,6 @@ for index, sound in transcript_d.items():
                 transcript_d[index] = asml_soft_obl[sound]
             elif sound in whistle_cons and "'" not in sound:
                 transcript_d[index] = hard_soft_replace[sound]
-# print(transcript_d)
 
 # Assimilation progressive of manner
 for index, sound in transcript_d.items():
@@ -212,11 +205,22 @@ for index, sound in transcript_d.items():
         if sound == "ц'" and transcript_d[index + 1] == "с'":
             if 'чся' not in word:
                 transcript_d[index + 1] = "ц'"
-# print(transcript_d)
+
+# Стягнення (stiahnennia lol)
+for index, sound in transcript_d.items():
+    if index != 1 and index != len(transcript_d):
+        if transcript_d[index - 1] == sound:
+            if sound in consonant_sounds and transcript_d[index + 1] in consonant_sounds:
+                transcript_d[index] = ''
 
 # Capitalize stressed vowel
 if stress:
     transcript_d[stress] = transcript_d[stress].upper()
 
+# Clean up after stiahnennia
+transcript_l = []
+for index, sound in transcript_d.items():
+    if sound: transcript_l.append(sound)
+
 # Print my finished baby
-print('|' + ' '.join(transcript_d.values()) + '|')
+print('|' + ' '.join(transcript_l) + '|')
