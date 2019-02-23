@@ -1,3 +1,4 @@
+import re
 print('Програма фонематичної транскрипції слів')
 
 # Just lists of letters
@@ -29,7 +30,6 @@ asml_manner = {'д' : 'z', "д'" : "z'", 'т' : 'ц', "т'" : "ц'"}
 asml_manner_place_1 = {'д' : 'j', "д'" : 'j', 'т' : 'ч', "т'" : 'ч', 'з' : 'ж', "з'" : 'ж',
                      'с' : 'ш', "с'" : 'ш', 'z' : 'j', "z'" : 'j', 'ц' : 'ч', "ц'" : 'ч'}
 asml_manner_place_2 = {'ж' : 'з', 'ш' : 'с', 'j' : 'z', 'ч' : 'ц'}
-# voc_semivowels = {'в' : 'ў', 'й' : 'ĭ'}
 asml_voice_unvoice = ['легк', 'вогк', 'кігт', 'нігт', 'дьогт', 'дігт']
 preffs = ['від', 'під', 'над', 'перед', 'серед']
 
@@ -64,13 +64,15 @@ def z_j_replace(word):
         return word
 
 
-# Transcribing the entire word (not including assimilation)
-word = z_j_replace(word)
-if 'яєчн' in word: word = word.replace('яєчн', 'яєшн')
-for el in asml_voice_unvoice:
+word = z_j_replace(word)                                    # розведення дж, дз як африкат/окремих звуків
+word = re.sub(r'([сн])т([цч]|ськ|ств)', r'\1\2', word)      # спрощення
+if 'яєчн' in word: word = word.replace('яєчн', 'яєшн')      # дисиміляція
+for el in asml_voice_unvoice:                               # асиміляція за глухістю у словах-винятках
     if el in word:
         new_el = el.replace('г', 'х')
         word = word.replace(el, new_el)
+
+# Transcribing the entire word (not including assimilation)
 transcript = ''
 for n, letter in enumerate(word):
     if letter in uni_vowels:
@@ -163,16 +165,6 @@ for index, sound in transcript_d.items():
                 transcript_d[index] = asml_unvoice[sound]
         elif sound in asml_voice.keys() and transcript_d[index + 1] in asml_voice.values():
             transcript_d[index] = asml_voice[sound]
-
-# Vocalization (semivowels)
-# for index, sound in transcript_d.items():
-#     if sound in voc_semivowels.keys():
-#         if index == len(transcript_d):
-#             transcript_d[index] = voc_semivowels[sound]
-#         elif transcript_d[index + 1] == sound:
-#             pass
-#         elif transcript_d[index + 1] in consonant_sounds:
-#             transcript_d[index] = voc_semivowels[sound]
 
 # Assimilation of manner
 for index, sound in transcript_d.items():
