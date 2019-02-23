@@ -51,13 +51,11 @@ def z_j_replace(word):
             if symb == 'д' and word[n + 1] == 'з':
                 if (word[n - 2] + word[n - 1] + symb) in preffs: pass
                 elif (word[n - 4] + word[n - 3] + word[n - 2] + word[n - 1] + symb) in preffs: pass
-                else:
-                    word = word[:n] + 'zz' + word[n + 2:]
+                else: word = word[:n] + 'zz' + word[n + 2:]
             if symb == 'д' and word[n + 1] == 'ж':
                 if (word[n - 2] + word[n - 1] + symb) in preffs: pass
                 elif (word[n - 4] + word[n - 3] + word[n - 2] + word[n - 1] + symb) in preffs: pass
-                else:
-                    word = word[:n] + 'jj' + word[n + 2:]
+                else: word = word[:n] + 'jj' + word[n + 2:]
     else:
         word = word.replace('zz', 'z')
         word = word.replace('jj', 'j')
@@ -83,8 +81,7 @@ for n, letter in enumerate(word):
                 transcript = transcript[:-1]
                 transcript += dv_replace_1[letter]
             elif transcript[-1] in hard_soft_replace.keys():
-                transcript += "'"
-                transcript += dv_replace_2[letter]
+                transcript += "'" + dv_replace_2[letter]
             elif transcript[-1] in hard_softened.values():
                 transcript += '!' + dv_replace_2[letter]
             elif transcript[-1] == 'ь':
@@ -110,12 +107,9 @@ for n, letter in enumerate(word):
                 else: transcript += letter
             else: transcript += letter
     else:
-        if letter == '+':
-            stress = len(transcript)
-        elif letter == "'":
-            transcript += letter
-        elif letter == 'щ':
-            transcript += 'шч'
+        if letter == '+': stress = len(transcript)
+        elif letter == "'": transcript += letter
+        elif letter == 'щ': transcript += 'шч'
         elif letter in consonants:
             if transcript:
                 if transcript[-1] == 'ь':
@@ -127,26 +121,21 @@ else:
     if transcript[-1] == 'ь':
         if transcript[-2] in hard_soft_replace.keys():
             transcript = transcript[:-1] + "'"
-        else:
-            transcript = transcript[:-1]
-if stress:
-    transcript = transcript[:stress] + '+' + transcript[stress:]
+        else: transcript = transcript[:-1]
+if stress: transcript = transcript[:stress] + '+' + transcript[stress:]
 
 
 # Creating a dictionary for each sound with own index
 for token in transcript:
-    if token == '+':
-        stress = ind
+    if token == '+': stress = ind
     elif token != "'" and token != '!':
         if sound:
             transcript_d[ind] = sound
             ind += 1
         sound = token
-    else:
-        sound += token
+    else: sound += token
 else:
-    if sound:
-        transcript_d[ind] = sound
+    if sound: transcript_d[ind] = sound
 
 
 # Assimilation hard to soft before half_soft labial sounds
@@ -161,8 +150,7 @@ for index, sound in transcript_d.items():
 for index, sound in transcript_d.items():
     if index != len(transcript_d):
         if sound in asml_unvoice.keys() and transcript_d[index + 1] in asml_unvoice.values():
-            if index == 1:
-                transcript_d[index] = asml_unvoice[sound]
+            if index == 1: transcript_d[index] = asml_unvoice[sound]
         elif sound in asml_voice.keys() and transcript_d[index + 1] in asml_voice.values():
             transcript_d[index] = asml_voice[sound]
 
@@ -206,8 +194,7 @@ for index, sound in transcript_d.items():
                 transcript_d[index] = ''
 
 # Capitalize stressed vowel
-if stress:
-    transcript_d[stress] = transcript_d[stress].upper()
+if stress: transcript_d[stress] = transcript_d[stress].upper()
 
 # Clean up after stiahnennia
 transcript_l = []
