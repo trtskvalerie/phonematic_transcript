@@ -1,20 +1,20 @@
 import re
 print('Програма фонематичної транскрипції слів')
 
-# Just lists of letters
+# Списки літер
 uni_vowels = ['а', 'о', 'у', 'е', 'і', 'и', 'я', 'ю', 'є', 'ї']
 vowels = ['а', 'о', 'у', 'е', 'і', 'и']
 double_vowels = ['я', 'ю', 'є', 'ї']
 consonants = ['б', 'в', 'г', 'ґ', 'д', 'ж', 'з', 'й', 'к', 'л', 'м', 'н', 'п', 'р', 'с', 'т', 'ф', 'х', 'ц', 'ч', 'ш',
               'ь', 'z', 'j']
 
-# Lists of sounds according to their characteristics
+# Списки літер за їхніми характеристиками
 consonant_sounds = ['б', 'в', 'г', 'ґ', 'д', "д'", 'j', "z'", 'z', 'ж', 'з', "з'", 'й', 'к', 'л', "л'", 'м',
                     'н', "н'", 'п', 'р', "р'", 'с', "с'", 'т', "т'", 'ф', 'х', 'ц', "ц'", 'ч', 'ш']
 soft_cons = ["д'", "z'", "з'", "л'", "н'", "р'", "с'", "т'", "ц'"]
 whistle_cons = ['з', "з'", 'с', "с'", 'z', "z'", 'ц', "ц'"]
 
-# Replace tools
+# Словники для заміни звуків
 hard_soft_replace = {'д' : "д'", 'z' : "z'", 'з' : "з'", 'л' : "л'",
                      'н' : "н'", 'р' : "р'", 'с' : "с'", 'т' : "т'", 'ц' : "ц'"}
 hard_softened = {'б!' : 'б', 'в!' : 'в', 'ф!' : 'ф', 'м!' : 'м', 'п!' : 'п', 'г!' : 'г', 'ґ!' : 'ґ', 'j!' : 'j',
@@ -33,7 +33,7 @@ asml_manner_place_2 = {'ж' : 'з', 'ш' : 'с', 'j' : 'z', 'ч' : 'ц'}
 asml_voice_unvoice = ['легк', 'вогк', 'кігт', 'нігт', 'дьогт', 'дігт']
 preffs = ['від', 'під', 'над', 'перед', 'серед']
 
-# Variables/dicts the code needs
+# Змінні/словники потрібні кодові
 transcript_d = dict()
 ind = 1
 stress = int()
@@ -70,7 +70,7 @@ for el in asml_voice_unvoice:                               # асиміляці
         new_el = el.replace('г', 'х')
         word = word.replace(el, new_el)
 
-# Transcribing the entire word (not including assimilation)
+# Транскрибування усього слова (без асиміляцій і такого іншого)
 transcript = ''
 for n, letter in enumerate(word):
     if letter in uni_vowels:
@@ -125,7 +125,7 @@ else:
 if stress: transcript = transcript[:stress] + '+' + transcript[stress:]
 
 
-# Creating a dictionary for each sound with own index
+# Створення словника з позиційним індексом для кожної фонеми
 for token in transcript:
     if token == '+': stress = ind
     elif token != "'" and token != '!':
@@ -138,7 +138,7 @@ else:
     if sound: transcript_d[ind] = sound
 
 
-# Assimilation hard to soft before half_soft labial sounds
+# Асиміляція за м'якістю перед губними напівпом'якшеними
 for index, sound in transcript_d.items():
     if sound in hard_softened.keys():
         if index != 1:
@@ -146,7 +146,7 @@ for index, sound in transcript_d.items():
                 transcript_d[index - 1] = hard_soft_replace[transcript_d[index - 1]]
         transcript_d[index] = hard_softened[sound]
 
-# Assimilation (voiced/unvoiced)
+# Асиміляція за дзвінкістю/глухістю
 for index, sound in transcript_d.items():
     if index != len(transcript_d):
         if sound in asml_unvoice.keys() and transcript_d[index + 1] in asml_unvoice.values():
@@ -154,13 +154,13 @@ for index, sound in transcript_d.items():
         elif sound in asml_voice.keys() and transcript_d[index + 1] in asml_voice.values():
             transcript_d[index] = asml_voice[sound]
 
-# Assimilation of manner
+# Асиміляція за способом творення
 for index, sound in transcript_d.items():
     if index != len(transcript_d):
         if sound in asml_manner.keys() and transcript_d[index + 1] in whistle_cons:
             transcript_d[index] = asml_manner[sound]
 
-# Assimilation of manner and place
+# Асиміляція за місцем і способом творення
 for index, sound in transcript_d.items():
     if index != len(transcript_d):
         if transcript_d[index + 1] in asml_manner_place_1.values():
@@ -170,7 +170,7 @@ for index, sound in transcript_d.items():
             if sound in asml_manner_place_2.keys():
                 transcript_d[index] = asml_manner_place_2[sound]
 
-# Assimilation hard to soft
+# Асиміляція за м'якістю
 for index, sound in transcript_d.items():
     if index != len(transcript_d):
         if transcript_d[index + 1] in soft_cons:
@@ -179,27 +179,27 @@ for index, sound in transcript_d.items():
             elif sound in whistle_cons and "'" not in sound:
                 transcript_d[index] = hard_soft_replace[sound]
 
-# Assimilation progressive of manner
+# Асиміляція прогресивна за способом творення
 for index, sound in transcript_d.items():
     if index != len(transcript_d):
         if sound == "ц'" and transcript_d[index + 1] == "с'":
             if 'чся' not in word:
                 transcript_d[index + 1] = "ц'"
 
-# Стягнення (stiahnennia lol)
+# Стягнення
 for index, sound in transcript_d.items():
     if index != 1 and index != len(transcript_d):
         if transcript_d[index - 1] == sound:
             if sound in consonant_sounds and transcript_d[index + 1] in consonant_sounds:
                 transcript_d[index] = ''
 
-# Capitalize stressed vowel
+# Позначення наголосу
 if stress: transcript_d[stress] = transcript_d[stress].upper()
 
-# Clean up after stiahnennia
+# Почистити список фонем після стягнення
 transcript_l = []
 for index, sound in transcript_d.items():
     if sound: transcript_l.append(sound)
 
-# Print my finished baby
+# Видати готову транскрипцію
 print('|' + ' '.join(transcript_l) + '|')
