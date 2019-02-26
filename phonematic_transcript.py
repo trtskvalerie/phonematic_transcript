@@ -117,8 +117,7 @@ for word in words:
             elif letter in consonants:
                 if transcript:
                     if transcript[-1] == 'ь':
-                        transcript = transcript[:-1] + "'"
-                        transcript += letter
+                        transcript = transcript[:-1] + "'" + letter
                     else: transcript += letter
                 else: transcript += letter
     else:
