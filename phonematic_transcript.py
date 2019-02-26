@@ -34,15 +34,7 @@ asml_voice_unvoice = ['легк', 'вогк', 'кігт', 'нігт', 'дьог�
 preffs = ['від', 'під', 'над', 'перед', 'серед']
 
 # Змінні/словники потрібні кодові
-transcript_d = dict()
-ind = 1
-stress = int()
-sound = str()
-
-
-word = input('Введіть слово: ')
-word = word.lower()
-word = word.replace(' ', '')
+trans_words = list()
 
 
 def z_j_replace(word):
@@ -61,148 +53,163 @@ def z_j_replace(word):
         word = word.replace('jj', 'j')
         return word
 
+with open('test_set_raw.txt', 'r', encoding='utf-8') as file:
+    words = file.readlines()
 
-word = z_j_replace(word)                                    # розведення дж, дз як африкат/окремих звуків
-word = re.sub(r'([сн])т([цч]|ськ|ств)', r'\1\2', word)      # спрощення
-if 'яєчн' in word: word = word.replace('яєчн', 'яєшн')      # дисиміляція
-for el in asml_voice_unvoice:                               # асиміляція за глухістю у словах-винятках
-    if el in word:
-        new_el = el.replace('г', 'х')
-        word = word.replace(el, new_el)
+for word in words:
+    transcript_d = dict()
+    ind = 1
+    stress = int()
+    sound = str()
 
-# Транскрибування усього слова (без асиміляцій і такого іншого)
-transcript = ''
-for n, letter in enumerate(word):
-    if letter in uni_vowels:
-        if letter in double_vowels:
-            if transcript == '' or transcript[-1] in vowels or word[n - 1] == '-':
-                transcript += dv_replace_1[letter]
-            elif transcript[-1] == "'":
-                transcript = transcript[:-1]
-                transcript += dv_replace_1[letter]
-            elif transcript[-1] in hard_soft_replace.keys():
-                transcript += "'" + dv_replace_2[letter]
-            elif transcript[-1] in hard_softened.values():
-                transcript += '!' + dv_replace_2[letter]
-            elif transcript[-1] == 'ь':
-                if transcript[-2] in hard_soft_replace.keys():
-                    transcript = transcript[:-1] + "'"
-                elif transcript[-2] in hard_softened.values():
-                    transcript = transcript[:-1] + '!'
-                transcript += dv_replace_1[letter]
-            elif transcript[-1] == 'й':
-                transcript += dv_replace_1[letter]
+    raw_word = word
+    word = word.lower()
+    word = word.replace(' ', '')
+
+    word = z_j_replace(word)                                    # розведення дж, дз як африкат/окремих звуків
+    word = re.sub(r'([сн])т([цч]|ськ|ств)', r'\1\2', word)      # спрощення
+    if 'яєчн' in word: word = word.replace('яєчн', 'яєшн')      # дисиміляція
+    for el in asml_voice_unvoice:                               # асиміляція за глухістю у словах-винятках
+        if el in word:
+            new_el = el.replace('г', 'х')
+            word = word.replace(el, new_el)
+
+    # Транскрибування усього слова (без асиміляцій і такого іншого)
+    transcript = ''
+    for n, letter in enumerate(word):
+        if letter in uni_vowels:
+            if letter in double_vowels:
+                if transcript == '' or transcript[-1] in vowels or word[n - 1] == '-':
+                    transcript += dv_replace_1[letter]
+                elif transcript[-1] == "'":
+                    transcript = transcript[:-1]
+                    transcript += dv_replace_1[letter]
+                elif transcript[-1] in hard_soft_replace.keys():
+                    transcript += "'" + dv_replace_2[letter]
+                elif transcript[-1] in hard_softened.values():
+                    transcript += '!' + dv_replace_2[letter]
+                elif transcript[-1] == 'ь':
+                    if transcript[-2] in hard_soft_replace.keys():
+                        transcript = transcript[:-1] + "'"
+                    elif transcript[-2] in hard_softened.values():
+                        transcript = transcript[:-1] + '!'
+                    transcript += dv_replace_1[letter]
+                elif transcript[-1] == 'й':
+                    transcript += dv_replace_1[letter]
+            else:
+                if transcript:
+                    if letter == 'і':
+                        if transcript[-1] in hard_soft_replace.keys():
+                            transcript += "'" + letter
+                        elif transcript[-1] in hard_softened.values():
+                            transcript += '!' + letter
+                        else: transcript += letter
+                    elif letter == 'о':
+                        if transcript[-1] == 'ь':
+                            transcript = transcript[:-1] + "'" + letter
+                        else: transcript += letter
+                    else: transcript += letter
+                else: transcript += letter
         else:
-            if transcript:
-                if letter == 'і':
-                    if transcript[-1] in hard_soft_replace.keys():
-                        transcript += "'" + letter
-                    elif transcript[-1] in hard_softened.values():
-                        transcript += '!' + letter
-                    else: transcript += letter
-                elif letter == 'о':
+            if letter == '+': stress = len(transcript)
+            elif letter == "'": transcript += letter
+            elif letter == 'щ': transcript += 'шч'
+            elif letter in consonants:
+                if transcript:
                     if transcript[-1] == 'ь':
-                        transcript = transcript[:-1] + "'" + letter
+                        transcript = transcript[:-1] + "'"
+                        transcript += letter
                     else: transcript += letter
                 else: transcript += letter
-            else: transcript += letter
     else:
-        if letter == '+': stress = len(transcript)
-        elif letter == "'": transcript += letter
-        elif letter == 'щ': transcript += 'шч'
-        elif letter in consonants:
-            if transcript:
-                if transcript[-1] == 'ь':
-                    transcript = transcript[:-1] + "'"
-                    transcript += letter
-                else: transcript += letter
-            else: transcript += letter
-else:
-    if transcript[-1] == 'ь':
-        if transcript[-2] in hard_soft_replace.keys():
-            transcript = transcript[:-1] + "'"
-        else: transcript = transcript[:-1]
-if stress: transcript = transcript[:stress] + '+' + transcript[stress:]
+        if transcript[-1] == 'ь':
+            if transcript[-2] in hard_soft_replace.keys():
+                transcript = transcript[:-1] + "'"
+            else: transcript = transcript[:-1]
+    if stress: transcript = transcript[:stress] + '+' + transcript[stress:]
 
 
-# Створення словника з позиційним індексом для кожної фонеми
-for token in transcript:
-    if token == '+': stress = ind
-    elif token != "'" and token != '!':
-        if sound:
-            transcript_d[ind] = sound
-            ind += 1
-        sound = token
-    else: sound += token
-else:
-    if sound: transcript_d[ind] = sound
+    # Створення словника з позиційним індексом для кожної фонеми
+    for token in transcript:
+        if token == '+': stress = ind
+        elif token != "'" and token != '!':
+            if sound:
+                transcript_d[ind] = sound
+                ind += 1
+            sound = token
+        else: sound += token
+    else:
+        if sound: transcript_d[ind] = sound
 
 
-# Асиміляція за м'якістю перед губними напівпом'якшеними
-for index, sound in transcript_d.items():
-    if sound in hard_softened.keys():
-        if index != 1:
-            if transcript_d[index - 1] in whistle_cons and "'" not in transcript_d[index - 1]:
-                transcript_d[index - 1] = hard_soft_replace[transcript_d[index - 1]]
-        transcript_d[index] = hard_softened[sound]
+    # Асиміляція за м'якістю перед губними напівпом'якшеними
+    for index, sound in transcript_d.items():
+        if sound in hard_softened.keys():
+            if index != 1:
+                if transcript_d[index - 1] in whistle_cons and "'" not in transcript_d[index - 1]:
+                    transcript_d[index - 1] = hard_soft_replace[transcript_d[index - 1]]
+            transcript_d[index] = hard_softened[sound]
 
-# Асиміляція за дзвінкістю/глухістю
-for index, sound in transcript_d.items():
-    if index != len(transcript_d):
-        if sound in asml_unvoice.keys() and transcript_d[index + 1] in asml_unvoice.values():
-            if index == 1: transcript_d[index] = asml_unvoice[sound]
-        elif sound in asml_voice.keys() and transcript_d[index + 1] in asml_voice.values():
-            transcript_d[index] = asml_voice[sound]
+    # Асиміляція за дзвінкістю/глухістю
+    for index, sound in transcript_d.items():
+        if index != len(transcript_d):
+            if sound in asml_unvoice.keys() and transcript_d[index + 1] in asml_unvoice.values():
+                if index == 1: transcript_d[index] = asml_unvoice[sound]
+            elif sound in asml_voice.keys() and transcript_d[index + 1] in asml_voice.values():
+                transcript_d[index] = asml_voice[sound]
 
-# Асиміляція за способом творення
-for index, sound in transcript_d.items():
-    if index != len(transcript_d):
-        if sound in asml_manner.keys() and transcript_d[index + 1] in whistle_cons:
-            transcript_d[index] = asml_manner[sound]
+    # Асиміляція за способом творення
+    for index, sound in transcript_d.items():
+        if index != len(transcript_d):
+            if sound in asml_manner.keys() and transcript_d[index + 1] in whistle_cons:
+                transcript_d[index] = asml_manner[sound]
 
-# Асиміляція за місцем і способом творення
-for index, sound in transcript_d.items():
-    if index != len(transcript_d):
-        if transcript_d[index + 1] in asml_manner_place_1.values():
-            if sound in asml_manner_place_1.keys():
-                transcript_d[index] = asml_manner_place_1[sound]
-        elif transcript_d[index + 1] in whistle_cons:
-            if sound in asml_manner_place_2.keys():
-                transcript_d[index] = asml_manner_place_2[sound]
+    # Асиміляція за місцем і способом творення
+    for index, sound in transcript_d.items():
+        if index != len(transcript_d):
+            if transcript_d[index + 1] in asml_manner_place_1.values():
+                if sound in asml_manner_place_1.keys():
+                    transcript_d[index] = asml_manner_place_1[sound]
+            elif transcript_d[index + 1] in whistle_cons:
+                if sound in asml_manner_place_2.keys():
+                    transcript_d[index] = asml_manner_place_2[sound]
 
-# Асиміляція за м'якістю
-for index, sound in transcript_d.items():
-    if index != len(transcript_d):
-        if transcript_d[index + 1] == "л'":
-            if sound == 'л':
-                transcript_d[index] = hard_soft_replace[sound]
-        elif transcript_d[index + 1] in soft_cons:
-            if sound in asml_soft_obl.keys():
-                transcript_d[index] = asml_soft_obl[sound]
-            elif sound in whistle_cons and "'" not in sound:
-                transcript_d[index] = hard_soft_replace[sound]
+    # Асиміляція за м'якістю
+    for index, sound in transcript_d.items():
+        if index != len(transcript_d):
+            if transcript_d[index + 1] == "л'":
+                if sound == 'л':
+                    transcript_d[index] = hard_soft_replace[sound]
+            elif transcript_d[index + 1] in soft_cons:
+                if sound in asml_soft_obl.keys():
+                    transcript_d[index] = asml_soft_obl[sound]
+                elif sound in whistle_cons and "'" not in sound:
+                    transcript_d[index] = hard_soft_replace[sound]
 
-# Асиміляція прогресивна за способом творення
-for index, sound in transcript_d.items():
-    if index != len(transcript_d):
-        if sound == "ц'" and transcript_d[index + 1] == "с'":
-            if 'чся' not in word:
-                transcript_d[index + 1] = "ц'"
+    # Асиміляція прогресивна за способом творення
+    for index, sound in transcript_d.items():
+        if index != len(transcript_d):
+            if sound == "ц'" and transcript_d[index + 1] == "с'":
+                if 'чся' not in word:
+                    transcript_d[index + 1] = "ц'"
 
-# Стягнення
-for index, sound in transcript_d.items():
-    if index != 1 and index != len(transcript_d):
-        if transcript_d[index - 1] == sound:
-            if sound in consonant_sounds and transcript_d[index + 1] in consonant_sounds:
-                transcript_d[index] = ''
+    # Стягнення
+    for index, sound in transcript_d.items():
+        if index != 1 and index != len(transcript_d):
+            if transcript_d[index - 1] == sound:
+                if sound in consonant_sounds and transcript_d[index + 1] in consonant_sounds:
+                    transcript_d[index] = ''
 
-# Позначення наголосу
-if stress: transcript_d[stress] = transcript_d[stress].upper()
+    # Позначення наголосу
+    if stress: transcript_d[stress] = transcript_d[stress].upper()
 
-# Почистити список фонем після стягнення
-transcript_l = []
-for index, sound in transcript_d.items():
-    if sound: transcript_l.append(sound)
+    # Почистити список фонем після стягнення
+    transcript_l = []
+    for index, sound in transcript_d.items():
+        if sound: transcript_l.append(sound)
 
-# Видати готову транскрипцію
-print('|' + ' '.join(transcript_l) + '|')
+    # Видати готову транскрипцію
+    trans_words.append(raw_word.strip('\n') + ' -> ' + '|' + ' '.join(transcript_l) + '|')
+
+with open('trans_words.txt', 'w', encoding='utf-8') as file:
+    file.write('\n'.join(trans_words))
