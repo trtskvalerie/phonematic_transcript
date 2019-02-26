@@ -24,7 +24,7 @@ dv_replace_2 = {'я' : 'а', 'ю' : 'у', 'є' : 'е', 'ї' : 'і'}
 asml_voice = {'п' : 'б', 'к' : 'ґ', 'т' : 'д', "т'" : "д'", 'ч' : 'j', 'ц' : 'z', "ц'" : "z'", 'ш' : 'ж', 'с' : 'з',
               "с'" : "з'", '' : 'г'}
 asml_unvoice = {'б' : 'п', 'ґ' : 'к', 'д' : 'т', "д'" : "т'", 'j' : 'ч', 'z' : 'ц', "z'" : "ц'", 'ж' : 'ш', 'з' : 'с',
-                "з'" : "с'"}
+                "з'" : "с'", '' : 'х'}
 asml_soft_obl = {'д' : "д'", 'т' : "т'", 'н' : "н'"}
 asml_manner = {'д' : 'z', "д'" : "z'", 'т' : 'ц', "т'" : "ц'"}
 asml_manner_place_1 = {'д' : 'j', "д'" : 'j', 'т' : 'ч', "т'" : 'ч', 'з' : 'ж', "з'" : 'ж',
@@ -142,7 +142,7 @@ else:
 for index, sound in transcript_d.items():
     if sound in hard_softened.keys():
         if index != 1:
-            if transcript_d[index - 1] in hard_soft_replace.keys():
+            if transcript_d[index - 1] in whistle_cons and "'" not in transcript_d[index - 1]:
                 transcript_d[index - 1] = hard_soft_replace[transcript_d[index - 1]]
         transcript_d[index] = hard_softened[sound]
 
@@ -173,7 +173,10 @@ for index, sound in transcript_d.items():
 # Асиміляція за м'якістю
 for index, sound in transcript_d.items():
     if index != len(transcript_d):
-        if transcript_d[index + 1] in soft_cons:
+        if transcript_d[index + 1] == "л'":
+            if sound == 'л':
+                transcript_d[index] = hard_soft_replace[sound]
+        elif transcript_d[index + 1] in soft_cons:
             if sound in asml_soft_obl.keys():
                 transcript_d[index] = asml_soft_obl[sound]
             elif sound in whistle_cons and "'" not in sound:
